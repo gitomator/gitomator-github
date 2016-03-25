@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 
-describe Gitomator::Service::Hosting::Service do
+describe Gitomator::GitHub::HostingProvider do
 
   before(:each) do
     @hosting = create_hosting_service(ENV['GIT_HOSTING_PROVIDER'])
