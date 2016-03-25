@@ -7,6 +7,6 @@ def create_hosting_service(provider_name)
   github_org   = ENV['GITHUB_TEST_ORG']
   raise "Please set the environment variable GITHUB_TEST_ORG" if access_token.nil?
 
-  provider = Gitomator::GitHub::HostingProvider.new(access_token, {org: github_org})
+  provider = Gitomator::GitHub::HostingProvider.with_access_token(access_token, {org: github_org})
   return Gitomator::Service::Hosting::Service.new (provider)
 end

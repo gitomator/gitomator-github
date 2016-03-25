@@ -1,3 +1,4 @@
+require 'gitomator/github/base_hosting_provider'
 require 'gitomator/model/hosting/repo'
 require 'gitomator/model/hosting/team'
 
@@ -6,9 +7,36 @@ module Gitomator
     class HostingProvider < BaseHostingProvider
 
 
+      # ---------------------- Static Factory Methods --------------------------
+
+      class << self
+        private :new
+      end
+
+      def self.with_access_token(access_token, opts = {})
+        raise "Access token is nil/empty" if access_token.nil? || access_token.empty?
+        new( opts.merge({:access_token => access_token}) )
+      end
+
+      def self.with_username_and_password(user, pass, opts = {})
+        raise "Username is nil/empty" if user.nil? || user.empty?
+        raise "Password is nil/empty" if pass.nil? || pass.empty?
+        new( opts.merge({:login => user, :password => pass}) )
+      end
+
+      def self.with_client_id_and_secret(client_id, client_secret, opts = {})
+        raise "Client id is nil/empty" if client_id.nil? || client_id.empty?
+        raise "Client seceret is nil/empty" if client_secret.nil? || client_secret.empty?
+        new( opts.merge({:client_id => client_id, :client_secret => client_secret}) )
+      end
+
+      # ---------------------- Static Factory Methods --------------------------
+
+
       # -------- Convert Sawyer::Resources to provider-agnostic objects --------
 
       def as_team(team)
+        return nil if team.nil?
         return Gitomator::Model::Hosting::Team.new(team.name,
             {
               id: team.id,
@@ -17,6 +45,7 @@ module Gitomator
       end
 
       def as_repo(repo)
+        return nil if repo.nil?
         return Gitomator::Model::Hosting::Repo.new(repo.name,
             repo.clone_url,
             {
@@ -71,7 +100,7 @@ module Gitomator
 
 
       def delete_repo(name)
-        as_repo super(name)
+        super(name)
       end
 
 
@@ -96,7 +125,7 @@ module Gitomator
       end
 
       def delete_team(name)
-        as_team super(name)
+        super(name)
       end
 
 

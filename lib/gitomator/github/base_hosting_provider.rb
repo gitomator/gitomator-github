@@ -7,8 +7,9 @@ module Gitomator
   module GitHub
     class BaseHostingProvider
 
-      def initialize(access_token, opts = {})
-        @gh = Octokit::Client.new(:access_token => access_token)
+
+      def initialize(opts)
+        @gh = Octokit::Client.new(opts)
         @org = opts[:org]
 
         # GitHub API doesn't have a straight forward way to get a team by name,
@@ -141,7 +142,7 @@ module Gitomator
         end
         raise "No such team, '#{name}'" unless @name2team_cache.has_key? name
 
-        t = @gh.update_team(@name2team_cache[name].opts[:id], opts)
+        t = @gh.update_team(@name2team_cache[name].id, opts)
         @name2team_cache[name] = t
         return t
       end
@@ -151,7 +152,7 @@ module Gitomator
           _fetch_teams()
         end
         if @name2team_cache.has_key? name
-          @gh.delete_team @name2team_cache[name].opts[:id]
+          @gh.delete_team @name2team_cache[name].id
           @name2team_cache.delete(name)
         end
       end
