@@ -30,7 +30,7 @@ module Gitomator
         new( opts.merge({:client_id => client_id, :client_secret => client_secret}) )
       end
 
-      # ---------------------- Static Factory Methods --------------------------
+      # ------------------------------------------------------------------------
 
 
       # -------- Convert Sawyer::Resources to provider-agnostic objects --------
@@ -58,6 +58,11 @@ module Gitomator
               has_downloads: repo.has_downloads,
               default_branch: repo.default_branch
             })
+      end
+
+      def as_repos(repos)
+        return nil if repos.nil?
+        repos.map {|resource| as_repo(resource) }
       end
 
       #-------------------------------------------------------------------------
@@ -101,6 +106,11 @@ module Gitomator
 
       def delete_repo(name)
         super(name)
+      end
+
+
+      def search_repos(query, opts = {})
+        as_repos super(query, opts)
       end
 
 

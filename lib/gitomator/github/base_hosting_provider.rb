@@ -116,6 +116,12 @@ module Gitomator
         @gh.delete_repo repo_name_full(name)
       end
 
+      #
+      # For opts see http://www.rubydoc.info/gems/octokit/Octokit%2FClient%2FSearch%3Asearch_issues
+      #
+      def search_repos(query, opts = {})
+        @gh.search_repos("#{query} user:#{@org}", opts).items
+      end
 
 
       #---------------------------- TEAMS ----------------------------------
