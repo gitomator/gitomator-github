@@ -307,6 +307,15 @@ module Gitomator
       end
 
 
+      def read_pull_reuqest(dst_repo, id)
+        begin
+          return @gh.pull_request(repo_name_full(dst_repo), id)
+        rescue Octokit::NotFound
+          return nil
+        end
+      end
+
+
 
 
 
