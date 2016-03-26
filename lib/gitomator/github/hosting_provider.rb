@@ -65,6 +65,11 @@ module Gitomator
         repos.map {|resource| as_repo(resource) }
       end
 
+      def as_teams(teams)
+        return nil if teams.nil?
+        teams.map {|resource| as_team(resource) }
+      end
+
       #-------------------------------------------------------------------------
 
 
@@ -136,6 +141,10 @@ module Gitomator
 
       def delete_team(name)
         super(name)
+      end
+
+      def search_teams(query, opts={})
+        as_teams super(query, opts)
       end
 
 

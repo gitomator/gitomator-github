@@ -164,6 +164,16 @@ module Gitomator
       end
 
 
+      def search_teams(query, opts={})
+        result = @name2team_cache.select {|k,_| k.downcase.include? query} .values
+        if result.empty?
+          _fetch_teams()
+          result = @name2team_cache.select {|k,_| k.downcase.include? query} .values
+        end
+        return result
+      end
+
+
       #---------------------------------------------------------------------
 
       def set_user_permission(user, repo, permission)
