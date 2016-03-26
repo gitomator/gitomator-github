@@ -13,7 +13,7 @@ module Gitomator
         @org = opts[:org]
 
         # GitHub API doesn't have a straight forward way to get a team by name,
-        # so we'll keep a cahce in memory (String --> Gitomator::Model::Hosting::Team)
+        # so we'll keep an in-memory cache (String --> Gitomator::Model::Hosting::Team)
         @name2team_cache = {}
       end
 
