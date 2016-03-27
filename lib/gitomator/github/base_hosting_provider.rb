@@ -329,6 +329,14 @@ module Gitomator
         @gh.merge_pull_request(repo_name_full(dst_repo), id, message)
       end
 
+      def close_pull_request(dst_repo, id)
+        @gh.close_pull_request(repo_name_full(dst_repo), id)
+      end
+
+      def open_pull_request(dst_repo, id)
+        @gh.update_pull_request(repo_name_full(dst_repo), id, {state: :open})
+      end
+
 
 
 
