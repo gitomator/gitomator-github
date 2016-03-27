@@ -283,7 +283,7 @@ module Gitomator
       # @param src (String) of the following format 'org/repo:branch'.
       # @param dst (String) of the following format 'org/repo:branch'.
       #
-      def create_pull_reuqest(src, dst, opts = {})
+      def create_pull_request(src, dst, opts = {})
 
         def extract_org_repo_and_branch(src_or_dst)
           match = src_or_dst.match(/(.+)\/(.+):(.+)/i)
@@ -307,12 +307,26 @@ module Gitomator
       end
 
 
-      def read_pull_reuqest(dst_repo, id)
+      def read_pull_request(dst_repo, id)
         begin
           return @gh.pull_request(repo_name_full(dst_repo), id)
         rescue Octokit::NotFound
           return nil
         end
+      end
+
+
+      #
+      # @param opts [Hash]
+      # => @param :state [Symbol] One of :open, :close or :all (default: :open)
+      #
+      def read_pull_requests(dst_repo, opts = {})
+        @gh.pulls(repo_name_full(dst_repo), opts)
+      end
+
+
+      def merge_pull_request(dst_repo, id, message='')
+        @gh.merge_pull_request(repo_name_full(dst_repo), id, message)
       end
 
 
