@@ -337,6 +337,16 @@ module Gitomator
         @gh.update_pull_request(repo_name_full(dst_repo), id, {state: :open})
       end
 
+      def label_pull_request(dst_repo, id, *labels)
+        @gh.add_labels_to_an_issue(repo_name_full(dst_repo), id, labels)
+      end
+
+      def unlabel_pull_request(dst_repo, id, *labels)
+        labels.each do |label|
+          @gh.remove_label(repo_name_full(dst_repo), id, label)
+        end
+      end
+
 
 
 
