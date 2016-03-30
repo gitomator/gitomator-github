@@ -1,7 +1,9 @@
 require 'gitomator/service/hosting/service'
 require 'gitomator/model/hosting/repo'
 require 'gitomator/model/hosting/team'
+require 'gitomator/util/repo/name_resolver'
 require 'octokit'
+
 
 module Gitomator
   module GitHub
@@ -11,6 +13,7 @@ module Gitomator
       def initialize(opts)
         @gh = Octokit::Client.new(opts)
         @org = opts[:org]
+        @repo_name_resolver = Gitomator::Util::Repo::NameResolver.new(@org)
 
         # GitHub API doesn't have a straight forward way to get a team by name,
         # so we'll keep an in-memory cache (String --> Gitomator::Model::Hosting::Team)
@@ -25,28 +28,7 @@ module Gitomator
       # ------------ Helper Methods, Dealing With Naming Conventions -------
 
       def repo_name_full(repo_name)
-        _tokenize_repo_name(repo_name).join "/"
-      end
-
-      def repo_name_org_only(repo_name)
-        _tokenize_repo_name(repo_name).first
-      end
-
-      def repo_name_repo_only(repo_name)
-        _tokenize_repo_name(repo_name).last
-      end
-
-
-      def _tokenize_repo_name(name)
-        split_name = name.split "/"
-        case split_name.length
-        when 1
-          return [@org, name]
-        when 2
-          return split_name
-        else
-          raise "Invalid repo name, '#{name}'"
-        end
+        @repo_name_resolver.full_name(repo_name)
       end
 
       #---------------------------------------------------------------------
@@ -78,12 +60,12 @@ module Gitomator
       #
       def create_repo(name, opts = {})
         # Decide whether this is an organization-repo or a user-repo ...
-        org = repo_name_org_only(name)
+        org = @repo_name_resolver.namespace_only(name)
         unless org.nil? || org == @gh.user.login
           opts[:organization] = org
         end
 
-        @gh.create_repo(repo_name_repo_only(name), opts)
+        @gh.create_repo(@repo_name_resolver.name_only(name), opts)
       end
 
       def read_repo(name)
