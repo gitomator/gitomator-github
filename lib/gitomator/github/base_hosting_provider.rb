@@ -60,7 +60,7 @@ module Gitomator
       #
       def create_repo(name, opts = {})
         # Decide whether this is an organization-repo or a user-repo ...
-        org = @repo_name_resolver.namespace_only(name)
+        org = @repo_name_resolver.namespace(name)
         unless org.nil? || org == @gh.user.login
           opts[:organization] = org
         end
