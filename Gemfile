@@ -4,4 +4,4 @@ source 'https://rubygems.org'
 gemspec
 
 # TODO: Remove this (only used for the very early stage of developing the library)
-gem 'gitomator', {:path => '/Users/joey/Desktop/repos/gitomator/gitomator'}
+gem 'gitomator', :git => 'git@bitbucket.org:joey_freund/gitomator.git'
