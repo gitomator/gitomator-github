@@ -238,6 +238,7 @@ module Gitomator
       #
       def update_team_membership(team_name, user_name, opts={})
         raise "Missing required option, :role" if opts[:role].nil?
+        opts[:role] = _strinigify_role(opts[:role])
         team = read_team(team_name)
         @gh.add_team_membership(team.opts[:id], user_name, opts).to_h
       end
