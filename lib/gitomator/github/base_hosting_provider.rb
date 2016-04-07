@@ -203,12 +203,22 @@ module Gitomator
       end
 
 
+
       #--------------------------- Team Membership -------------------------
+
 
       def create_team_membership(team_name, user_name, opts={})
         team = read_team(team_name)
-        opts[:role] = 'member' if opts[:role].nil?
+        opts[:role] = _strinigify_role(opts[:role])
         @gh.add_team_membership(team.opts[:id], user_name, opts).to_h
+      end
+
+      def _strinigify_role(role)
+        if ['admin', 'maintainer'].include? role.to_s.downcase
+          return 'maintainer'
+        else
+          return 'member'
+        end
       end
 
 
