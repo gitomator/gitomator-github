@@ -13,6 +13,25 @@ module Gitomator
         private :new
       end
 
+      #
+      # @param config [Hash<String,Object>]
+      # @return [Gitomator::GitHub::HostingProvider] GitHub hosting provider.
+      #
+      def self.from_config(config = {})
+        opts = { :org => config['organization'] }
+
+        if config['access_token']
+          return with_access_token(config['access_token'], opts)
+        elsif config['username'] && config['password']
+          return with_username_and_password(config['username'], config['password'], opts)
+        elsif config['client_id'] && config['client_secret']
+          return with_client_id_and_secret(config['client_id'], config['client_secret'], opts)
+        else
+          raise "Invalid GitHub hosting configuration - #{config}"
+        end
+      end
+
+
       def self.with_access_token(access_token, opts = {})
         raise "Access token is nil/empty" if access_token.nil? || access_token.empty?
         new( opts.merge({:access_token => access_token}) )
