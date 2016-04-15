@@ -9,47 +9,17 @@ module Gitomator
 
       # ---------------------- Static Factory Methods --------------------------
 
-      class << self
-        private :new
-      end
-
       #
       # @param config [Hash<String,Object>]
       # @return [Gitomator::GitHub::HostingProvider] GitHub hosting provider.
       #
       def self.from_config(config = {})
-        opts = { :org => config['organization'] }
-
-        if config['access_token']
-          return with_access_token(config['access_token'], opts)
-        elsif config['username'] && config['password']
-          return with_username_and_password(config['username'], config['password'], opts)
-        elsif config['client_id'] && config['client_secret']
-          return with_client_id_and_secret(config['client_id'], config['client_secret'], opts)
-        else
-          raise "Invalid GitHub hosting configuration - #{config}"
-        end
+        return new(
+          BaseHostingProvider.github_client_from_config(config),
+          config['organization']
+        )
       end
 
-
-      def self.with_access_token(access_token, opts = {})
-        raise "Access token is nil/empty" if access_token.nil? || access_token.empty?
-        new( opts.merge({:access_token => access_token}) )
-      end
-
-      def self.with_username_and_password(user, pass, opts = {})
-        raise "Username is nil/empty" if user.nil? || user.empty?
-        raise "Password is nil/empty" if pass.nil? || pass.empty?
-        new( opts.merge({:login => user, :password => pass}) )
-      end
-
-      def self.with_client_id_and_secret(client_id, client_secret, opts = {})
-        raise "Client id is nil/empty" if client_id.nil? || client_id.empty?
-        raise "Client seceret is nil/empty" if client_secret.nil? || client_secret.empty?
-        new( opts.merge({:client_id => client_id, :client_secret => client_secret}) )
-      end
-
-      # ------------------------------------------------------------------------
 
 
       # -------- Convert Sawyer::Resources to provider-agnostic objects --------

@@ -10,9 +10,40 @@ module Gitomator
     class BaseHostingProvider
 
 
-      def initialize(opts)
-        @gh = Octokit::Client.new(opts)
-        @org = opts[:org]
+      #=========================================================================
+
+      def self.github_client_from_config(config = {})
+        opts = {}
+
+        if config['access_token']
+          opts[:access_token]   = config['access_token']
+
+        elsif config['username'] && config['password']
+          opts[:login]          = config['username']
+          opts[:password]       = config['password']
+
+        elsif config['client_id'] && config['client_secret']
+          opts[:client_id]      = config['client_id']
+          opts[:client_secret]  = config['client_secret']
+
+        else
+          raise "Invalid GitHub hosting configuration - #{config}"
+        end
+
+        return Octokit::Client.new(opts)
+      end
+
+
+      #=========================================================================
+
+      #
+      # @param github_client [Octokit::Client]
+      # @param github_organization [String]
+      # @param opts [Hash]
+      #
+      def initialize(github_client, github_organization=nil, opts={})
+        @gh  = github_client
+        @org = github_organization
         @repo_name_resolver = Gitomator::Util::Repo::NameResolver.new(@org)
 
         # GitHub API doesn't have a straight forward way to get a team by name,
