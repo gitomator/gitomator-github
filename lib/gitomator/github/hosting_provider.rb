@@ -346,29 +346,19 @@ module Gitomator
 
 
       def merge_pull_request(dst_repo, id, message='')
-        @gh.merge_pull_request(repo_name_full(dst_repo), id, message)
+        Gitomator::GitHub::Model::PullRequest.new(
+          @gh.merge_pull_request(repo_name_full(dst_repo), id, message))
       end
 
       def close_pull_request(dst_repo, id)
-        @gh.close_pull_request(repo_name_full(dst_repo), id)
+        Gitomator::GitHub::Model::PullRequest.new(
+          @gh.close_pull_request(repo_name_full(dst_repo), id))
       end
 
       def open_pull_request(dst_repo, id)
-        @gh.update_pull_request(repo_name_full(dst_repo), id, {state: :open})
+        Gitomator::GitHub::Model::PullRequest.new(
+          @gh.update_pull_request(repo_name_full(dst_repo), id, {state: :open}))
       end
-
-      def label_pull_request(dst_repo, id, *labels)
-        @gh.add_labels_to_an_issue(repo_name_full(dst_repo), id, labels)
-      end
-
-      def unlabel_pull_request(dst_repo, id, *labels)
-        labels.each do |label|
-          @gh.remove_label(repo_name_full(dst_repo), id, label)
-        end
-      end
-
-
-
 
 
       #---------------------------------------------------------------------
