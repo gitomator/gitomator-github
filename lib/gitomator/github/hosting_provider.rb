@@ -2,6 +2,11 @@ require 'gitomator/github/base_hosting_provider'
 require 'gitomator/model/hosting/repo'
 require 'gitomator/model/hosting/team'
 
+require 'gitomator/github/model/hosted_repo'
+require 'gitomator/github/model/team'
+require 'gitomator/github/model/pull_request'
+
+
 module Gitomator
   module GitHub
     class HostingProvider < BaseHostingProvider
@@ -24,35 +29,35 @@ module Gitomator
 
       # -------- Convert Sawyer::Resources to provider-agnostic objects --------
 
-      def as_team(team)
-        return nil if team.nil?
-        return Gitomator::Model::Hosting::Team.new(team.name,
-            {
-              id: team.id,
-              org: (team.organization.nil? ? @org : team.organization.login)
-            })
-      end
+      # def as_team(team)
+      #   return nil if team.nil?
+      #   return Gitomator::Model::Hosting::Team.new(team.name,
+      #       {
+      #         id: team.id,
+      #         org: (team.organization.nil? ? @org : team.organization.login)
+      #       })
+      # end
 
-      def as_repo(repo)
-        return nil if repo.nil?
-        return Gitomator::Model::Hosting::Repo.new(repo.name,
-            repo.clone_url,
-            {
-              name: repo.name,
-              description: repo.description,
-              homepage: repo.homepage,
-              private: repo.private?,
-              has_issues: repo.has_issues,
-              has_wiki: repo.has_wiki,
-              has_downloads: repo.has_downloads,
-              default_branch: repo.default_branch
-            })
-      end
+      # def as_repo(repo)
+      #   return nil if repo.nil?
+      #   return Gitomator::Model::Hosting::Repo.new(repo.name,
+      #       repo.clone_url,
+      #       {
+      #         name: repo.name,
+      #         description: repo.description,
+      #         homepage: repo.homepage,
+      #         private: repo.private?,
+      #         has_issues: repo.has_issues,
+      #         has_wiki: repo.has_wiki,
+      #         has_downloads: repo.has_downloads,
+      #         default_branch: repo.default_branch
+      #       })
+      # end
 
-      def as_repos(repos)
-        return nil if repos.nil?
-        repos.map {|resource| as_repo(resource) }
-      end
+      # def as_repos(repos)
+      #   return nil if repos.nil?
+      #   repos.map {|resource| as_repo(resource) }
+      # end
 
       def as_teams(teams)
         return nil if teams.nil?
@@ -73,11 +78,11 @@ module Gitomator
       #   :has_download(Boolean)
       #
       def create_repo(name, opts = {})
-        as_repo super(name, opts)
+        Gitomator::GitHub::Model::HostedRepo.new(super)
       end
 
       def read_repo(name)
-        as_repo super(name)
+        Gitomator::GitHub::Model::HostedRepo.new(super)
       end
 
       #
@@ -93,7 +98,7 @@ module Gitomator
       #
       def update_repo(name, opts = {})
         unless opts.empty?
-          as_repo super(name, opts)
+          Gitomator::GitHub::Model::HostedRepo.new(super)
         end
       end
 
@@ -104,7 +109,7 @@ module Gitomator
 
 
       def search_repos(query, opts = {})
-        as_repos super(query, opts)
+        super(query, opts).map {|r| Gitomator::GitHub::Model::HostedRepo.new(r)}
       end
 
 
@@ -112,11 +117,11 @@ module Gitomator
       #---------------------------- TEAMS ----------------------------------
 
       def create_team(name, opts = {})
-          as_team super(name, opts)
+        Gitomator::GitHub::Model::Team.new(super)
       end
 
       def read_team(name)
-        as_team super(name)
+        Gitomator::GitHub::Model::Team.new(super)
       end
 
       #
@@ -125,7 +130,7 @@ module Gitomator
       #  - :permission (String, one of 'pull', 'push' or 'admin')
       #
       def update_team(name, opts)
-        as_team super(name, opts)
+        Gitomator::GitHub::Model::Team.new(super)
       end
 
       def delete_team(name)
@@ -133,11 +138,25 @@ module Gitomator
       end
 
       def search_teams(query, opts={})
-        as_teams super(query, opts)
+        super(query, opts).map {|t| Gitomator::GitHub::Model::Team.new(t)}
       end
 
 
       #---------------------------------------------------------------------
+
+      def create_pull_request(src, dst, opts = {})
+        Gitomator::GitHub::Model::PullRequest.new(super, @gh)
+      end
+
+      def read_pull_request(base_repo, id)
+        Gitomator::GitHub::Model::PullRequest.new(super, @gh)
+      end
+
+      def read_pull_requests(base_repo, opts={})
+        super(base_repo, opts).map {|pr| Gitomator::GitHub::Model::PullRequest.new(pr, @gh)}
+      end
+
+
 
 
     end
