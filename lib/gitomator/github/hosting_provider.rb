@@ -14,7 +14,8 @@ module Gitomator
       # @return [Gitomator::GitHub::HostingProvider] GitHub hosting provider.
       #
       def self.from_config(config = {})
-        return new(Gitomator::GitHub::github_client_from_config(config), config['organization'])
+        org = config['organization'] || config[:organization]
+        return new(Gitomator::GitHub::github_client_from_config(config), org)
       end
 
 
@@ -30,8 +31,7 @@ module Gitomator
         @org = github_organization
         @repo_name_resolver = Gitomator::Util::Repo::NameResolver.new(@org)
 
-        # GitHub API doesn't have a straight forward way to get a team by name,
-        # so we'll keep an in-memory cache (String --> Gitomator::Model::Hosting::Team)
+        # GitHub API doesn't have a straight forward way to get a team by name, so we'll keep an in-memory cache
         @name2team_cache = {}
       end
 
