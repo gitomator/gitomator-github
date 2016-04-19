@@ -197,9 +197,9 @@ module Gitomator
         raise "No such team, #{team}" if t.nil?
 
         if permission.nil?
-          @gh.remove_team_repo(t.opts[:id], repo_name_full(repo))
+          @gh.remove_team_repo(t.id, repo_name_full(repo))
         else
-          @gh.add_team_repo(t.opts[:id], repo_name_full(repo),
+          @gh.add_team_repo(t.id, repo_name_full(repo),
             {
               permission: permission,
               accept: 'application/vnd.github.ironman-preview+json'
@@ -232,7 +232,7 @@ module Gitomator
       def create_team_membership(team_name, user_name, opts={})
         team = read_team(team_name)
         opts[:role] = _strinigify_role(opts[:role])
-        @gh.add_team_membership(team.opts[:id], user_name, opts).to_h
+        @gh.add_team_membership(team.id, user_name, opts).to_h
       end
 
       def _strinigify_role(role)
@@ -247,7 +247,7 @@ module Gitomator
       def read_team_membership(team_name, user_name)
         team = read_team(team_name)
         begin
-          return @gh.team_membership(team.opts[:id], user_name).to_h
+          return @gh.team_membership(team.id, user_name).to_h
         rescue Octokit::NotFound
           return nil
         end
@@ -262,12 +262,12 @@ module Gitomator
         raise "Missing required option, :role" if opts[:role].nil?
         opts[:role] = _strinigify_role(opts[:role])
         team = read_team(team_name)
-        @gh.add_team_membership(team.opts[:id], user_name, opts).to_h
+        @gh.add_team_membership(team.id, user_name, opts).to_h
       end
 
       def delete_team_membership(team_name, user_name)
         team = read_team(team_name)
-        @gh.remove_team_membership(team.opts[:id], user_name)
+        @gh.remove_team_membership(team.id, user_name)
       end
 
 
@@ -283,7 +283,7 @@ module Gitomator
         include_keys = [:login, :id, :type, :site_admin]
         begin
           @gh.auto_paginate = true # We want to get all team members
-          @gh.team_members(team.opts[:id])
+          @gh.team_members(team.id)
             .map {|m| m.to_h.select { |k,_|  include_keys.include? k } }
         ensure
           @gh.auto_paginate = nil  # We don't want to hit GitHub's API rate-limit

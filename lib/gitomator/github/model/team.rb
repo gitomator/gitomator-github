@@ -11,6 +11,9 @@ module Gitomator
           @r = gh_team
         end
 
+        def id
+          @r.id
+        end
 
         def name
           @r.name
