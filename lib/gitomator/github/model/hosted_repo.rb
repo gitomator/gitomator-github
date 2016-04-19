@@ -25,17 +25,6 @@ module Gitomator
         end
 
 
-        # More properties of @r ...
-        #
-        #         description: @r.description,
-        #         homepage: @r.homepage,
-        #         private: @r.private?,
-        #         has_issues: @r.has_issues,
-        #         has_wiki: @r.has_wiki,
-        #         has_downloads: @r.has_downloads,
-        #         default_branch: @r.default_branch
-
-
       end
     end
   end
