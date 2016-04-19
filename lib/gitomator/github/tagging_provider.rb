@@ -1,8 +1,10 @@
-require 'gitomator/github/base_hosting_provider'
+require 'gitomator/github'
+require 'gitomator/github/base_provider'
+
 
 module Gitomator
   module GitHub
-    class TaggingProvider < BaseHostingProvider
+    class TaggingProvider < Gitomator::GitHub::BaseProvider
 
 
       # ---------------------- Static Factory Methods --------------------------
@@ -12,10 +14,8 @@ module Gitomator
       # @return [Gitomator::GitHub::HostingProvider] GitHub hosting provider.
       #
       def self.from_config(config = {})
-        return new(
-          BaseHostingProvider.github_client_from_config(config),
-          config['organization']
-        )
+        return new(Gitomator::GitHub::github_client_from_config(config),
+                   config['organization'])
       end
 
       #-------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 require 'gitomator/github'
+require 'gitomator/github/base_provider'
 require 'gitomator/github/model/hosted_repo'
 require 'gitomator/github/model/pull_request'
 require 'gitomator/github/model/team'
@@ -7,7 +8,7 @@ require 'gitomator/util/repo/name_resolver'
 
 module Gitomator
   module GitHub
-    class HostingProvider
+    class HostingProvider < Gitomator::GitHub::BaseProvider
 
       #
       # @param config [Hash<String,Object>]
@@ -26,11 +27,8 @@ module Gitomator
       # @param github_organization [String]
       # @param opts [Hash]
       #
-      def initialize(github_client, github_organization=nil, opts={})
-        @gh  = github_client
-        @org = github_organization
-        @repo_name_resolver = Gitomator::Util::Repo::NameResolver.new(@org)
-
+      def initialize(github_client, github_organization=nil)
+        super
         # GitHub API doesn't have a straight forward way to get a team by name, so we'll keep an in-memory cache
         @name2team_cache = {}
       end
