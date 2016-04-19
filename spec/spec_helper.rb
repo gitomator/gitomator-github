@@ -1,12 +1,16 @@
+require 'gitomator/service/hosting/service'
 require 'gitomator/github/hosting_provider'
 
 
-def create_hosting_service(provider_name)
-  access_token = ENV['GITHUB_TEST_ACCESS_TOKEN']
-  raise "Please set the environment variable GITHUB_TEST_ACCESS_TOKEN" if access_token.nil?
-  github_org   = ENV['GITHUB_TEST_ORG']
-  raise "Please set the environment variable GITHUB_TEST_ORG" if access_token.nil?
+def create_hosting_service_from_environment_variables()
+  ['GITHUB_TEST_ACCESS_TOKEN', 'GITHUB_TEST_ORG'].each do |var|
+    raise "Please set the #{var} environment variable." if ENV[var].nil?
+  end
 
-  provider = Gitomator::GitHub::HostingProvider.with_access_token(access_token, {org: github_org})
-  return Gitomator::Service::Hosting::Service.new (provider)
+  Gitomator::Service::Hosting::Service.new(
+    Gitomator::GitHub::HostingProvider.from_config({
+        :access_token => ENV['GITHUB_TEST_ACCESS_TOKEN'],
+        :organization => ENV['GITHUB_TEST_ORG']
+    })
+  )
 end

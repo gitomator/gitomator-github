@@ -3,8 +3,9 @@ require 'spec_helper'
 
 describe Gitomator::GitHub::HostingProvider do
 
+
   before(:each) do
-    @hosting = create_hosting_service(ENV['GIT_HOSTING_PROVIDER'])
+    @hosting = create_hosting_service_from_environment_variables()
   end
 
 
@@ -15,13 +16,13 @@ describe Gitomator::GitHub::HostingProvider do
 
   it "create_repo should return a repo model-object" do
     repo = "test-repo-#{(Time.now.to_f * 1000).to_i}"
-    expect(@hosting.create_repo(repo, {})).to be_a_kind_of(Gitomator::Model::Hosting::Repo)
+    expect(@hosting.create_repo(repo, {})).to be_a_kind_of(Gitomator::GitHub::Model::HostedRepo)
   end
 
 
   it "read_repo should return a repo model-object" do
     repo = @hosting.create_repo("test-repo-#{(Time.now.to_f * 1000).to_i}", {})
-    expect(@hosting.read_repo(repo.name)).to be_a_kind_of(Gitomator::Model::Hosting::Repo)
+    expect(@hosting.read_repo(repo.name)).to be_a_kind_of(Gitomator::GitHub::Model::HostedRepo)
   end
 
   it "read_repo should return nil when repo doesn't exist" do
@@ -59,7 +60,7 @@ describe Gitomator::GitHub::HostingProvider do
   it "create team" do
     name = "team-#{(Time.now.to_f * 1000).to_i}"
     team = @hosting.create_team(name)
-    expect(team).to be_a_kind_of(Gitomator::Model::Hosting::Team)
+    expect(team).to be_a_kind_of(Gitomator::GitHub::Model::Team)
     expect(team.name).to_not be name
   end
 
@@ -69,7 +70,7 @@ describe Gitomator::GitHub::HostingProvider do
     @hosting.create_team(name)
     team = @hosting.read_team(name)
 
-    expect(team).to be_a_kind_of(Gitomator::Model::Hosting::Team)
+    expect(team).to be_a_kind_of(Gitomator::GitHub::Model::Team)
     expect(team.name).to_not be name
   end
 
@@ -92,7 +93,7 @@ describe Gitomator::GitHub::HostingProvider do
     expect(team1.nil? || team1.name == name2).to be true
 
     team2 = @hosting.read_team(name2)
-    expect(team2).to be_a_kind_of(Gitomator::Model::Hosting::Team)
+    expect(team2).to be_a_kind_of(Gitomator::GitHub::Model::Team)
     expect(team2.name).to_not be name2
   end
 
