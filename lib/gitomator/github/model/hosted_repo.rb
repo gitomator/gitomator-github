@@ -21,7 +21,7 @@ module Gitomator
         end
 
         def url
-          @r.url
+          @r.clone_url
         end
 
 
