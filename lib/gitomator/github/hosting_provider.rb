@@ -228,14 +228,9 @@ module Gitomator
 
       #--------------------------- Team Membership -------------------------
 
+      #----------- Helpers ---------
 
-      def create_team_membership(team_name, user_name, opts={})
-        team = read_team(team_name)
-        opts[:role] = _strinigify_role(opts[:role])
-        @gh.add_team_membership(team.id, user_name, opts).to_h
-      end
-
-      def _strinigify_role(role)
+      def gitomator_role_2_github_role(role)
         if ['admin', 'maintainer'].include? role.to_s.downcase
           return 'maintainer'
         else
@@ -243,31 +238,46 @@ module Gitomator
         end
       end
 
+      def github_role_2_gitomator_role(role)
+        role == 'maintainer' ? 'admin' : role
+      end
+
+      def team_id(team_name)
+        team = read_team(team_name)
+        raise "No such team, #{team_name}" if team.nil?
+        return team.id
+      end
+
+      #-----------------------------
+
+
+      def create_team_membership(team_name, user_name, role='member')
+        @gh.add_team_membership(team_id(team_name), user_name,
+          { :role => gitomator_role_2_github_role(role) }
+        )
+        return role
+      end
+
 
       def read_team_membership(team_name, user_name)
-        team = read_team(team_name)
         begin
-          return @gh.team_membership(team.id, user_name).to_h
+          m = @gh.team_membership(team_id(team_name), user_name)
+          return m.nil? ? nil : m.role
         rescue Octokit::NotFound
           return nil
         end
       end
 
 
-      #
-      # The only valid option is :role, which must be one of 'member' or
-      # 'maintainer'.
-      #
-      def update_team_membership(team_name, user_name, opts={})
-        raise "Missing required option, :role" if opts[:role].nil?
-        opts[:role] = _strinigify_role(opts[:role])
-        team = read_team(team_name)
-        @gh.add_team_membership(team.id, user_name, opts).to_h
+      def update_team_membership(team_name, user_name, role)
+        @gh.add_team_membership(team_id(team_name), user_name,
+          { :role => gitomator_role_2_github_role(role) } )
+        return role
       end
 
+
       def delete_team_membership(team_name, user_name)
-        team = read_team(team_name)
-        @gh.remove_team_membership(team.id, user_name)
+        @gh.remove_team_membership(team_id(team_name), user_name)
       end
 
 
