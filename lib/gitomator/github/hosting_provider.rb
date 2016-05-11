@@ -3,6 +3,7 @@ require 'gitomator/github/base_provider'
 require 'gitomator/github/model/hosted_repo'
 require 'gitomator/github/model/pull_request'
 require 'gitomator/github/model/team'
+require 'gitomator/github/model/user'
 require 'gitomator/util/repo/name_resolver'
 
 
@@ -47,16 +48,8 @@ module Gitomator
       #---------------------------------------------------------------------
 
       def _fetch_teams
-        name2team = {}
-
-        begin
-          @gh.auto_paginate = true # We want to get all teams
-          @gh.org_teams(@org).each  do |t|
-            name2team[t.name] = t
-          end
-          @name2team_cache = name2team
-        ensure
-          @gh.auto_paginate = nil  # We don't want to hit GitHub's API rate-limit
+        with_auto_paginate do
+          @name2team_cache = @gh.org_teams(@org).map {|t| [t.name, t]} .to_h
         end
       end
 
@@ -283,21 +276,37 @@ module Gitomator
 
       #---------------------------------------------------------------------
 
-
-      def search_users(opts={})
-        # At the moment, we can only search by team_name
-        raise "Missing required option, :team_name" if opts[:team_name].nil?
-        team = read_team(opts[:team_name])
-
-        # Return an iterable of hashes, each hash containing the following keys:
-        include_keys = [:login, :id, :type, :site_admin]
+      def with_auto_paginate
+        raise "You must supply a block" unless block_given?
         begin
           @gh.auto_paginate = true # We want to get all team members
-          @gh.team_members(team.id)
-            .map {|m| m.to_h.select { |k,_|  include_keys.include? k } }
+          yield
         ensure
           @gh.auto_paginate = nil  # We don't want to hit GitHub's API rate-limit
         end
+      end
+
+
+      def search_users(query, opts={})
+
+        # If the team's name is specified ...
+        gh_users = nil
+        if opts[:team_name]
+          team = read_team(opts[:team_name])
+          gh_users = with_auto_paginate { @gh.team_members(team.id) }
+        else
+          gh_users = with_auto_paginate { @gh.org_members(@org) }
+        end
+
+        result = gh_users.map { |u| Gitomator::GitHub::Model::User.new(u) }
+
+        if query.is_a?(String) && (! query.empty?)
+          result = result.select {|u| u.username.include? query }
+        elsif query.is_a? Regexp
+          result = result.select {|u| query.match(u.username) }
+        end
+
+        return result
       end
 
 
