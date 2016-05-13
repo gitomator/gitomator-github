@@ -56,15 +56,20 @@ module Gitomator
 
       #---------------------------- REPO -----------------------------------
 
+      SUPPORTED_CREATE_OPTS = [:description, :homepage, :private, :has_issues,
+                               :has_wiki, :has_downloads, :auto_init]
       #
-      # opts:
-      #   :auto_init (Boolean)
-      #   :private (Boolean)
-      #   :has_issues (Boolean)
-      #   :has_wiki (Boolean)
-      #   :has_download(Boolean)
+      # @option opts [String]  :description
+      # @option opts [String]  :homepage
+      # @option opts [Boolean] :private
+      # @option opts [Boolean] :has_issues
+      # @option opts [Boolean] :has_wiki
+      # @option opts [Boolean] :has_downloads
+      # @option opts [Boolean] :auto_init
       #
       def create_repo(name, opts = {})
+        opts = opts.select {|k,_| SUPPORTED_CREATE_OPTS.include? k }
+
         # Decide whether this is an organization-repo or a user-repo ...
         org = @repo_name_resolver.namespace(name)
         unless org.nil? || org == @gh.user.login
@@ -72,8 +77,10 @@ module Gitomator
         end
 
         return Gitomator::GitHub::Model::HostedRepo.new(
-          @gh.create_repo(@repo_name_resolver.name_only(name), opts))
+          @gh.create_repo(@repo_name_resolver.name_only(name), opts)
+        )
       end
+
 
       def read_repo(name)
         begin
@@ -83,18 +90,22 @@ module Gitomator
         end
       end
 
+
+      SUPPORTED_UPDATE_OPTS = [:name, :description, :homepage, :private,
+                               :has_issues, :has_wiki, :has_downloads,
+                               :default_branch]
       #
-      # opts:
-      #   :name (String) — Name of the repo
-      #   :description (String) — Description of the repo
-      #   :homepage (String) — Home page of the repo
-      #   :private (String) — true makes the repository private, and false makes it public.
-      #   :has_issues (String) — true enables issues for this repo, false disables issues.
-      #   :has_wiki (String) — true enables wiki for this repo, false disables wiki.
-      #   :has_downloads (String) — true enables downloads for this repo, false disables downloads.
-      #   :default_branch (String) — Update the default branch for this repository.
+      # @option opts [String]  :name — Name of the repo
+      # @option opts [String]  :description — Description of the repo
+      # @option opts [String]  :homepage — Home page of the repo
+      # @option opts [Boolean] :private — true makes the repository private, and false makes it public.
+      # @option opts [Boolean] :has_issues — true enables issues for this repo, false disables issues.
+      # @option opts [Boolean] :has_wiki — true enables wiki for this repo, false disables wiki.
+      # @option opts [Boolean] :has_downloads — true enables downloads for this repo, false disables downloads.
+      # @option opts [String]  :default_branch — Update the default branch for this repository.
       #
       def update_repo(name, opts = {})
+        opts = opts.select {|k,_| SUPPORTED_UPDATE_OPTS.include? k }
         unless opts.empty?
           return Gitomator::GitHub::Model::HostedRepo.new(
                 @gh.edit_repository repo_name_full(name), opts)

@@ -24,6 +24,18 @@ module Gitomator
           @r.clone_url
         end
 
+        def properties
+          return {
+            :description    => @r.description,
+            :homepage       => @r.homepage,
+            :private        => @r.private?,
+            :has_issues     => @r.has_issues?,
+            :has_wiki       => @r.has_wiki?,
+            :has_downloads  => @r.has_downloads?,
+            :default_branch => @r.default_branch
+          }
+        end
+
 
       end
     end
