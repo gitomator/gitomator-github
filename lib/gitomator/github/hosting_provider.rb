@@ -375,17 +375,17 @@ module Gitomator
 
       def merge_pull_request(dst_repo, id, message='')
         Gitomator::GitHub::Model::PullRequest.new(
-          @gh.merge_pull_request(repo_name_full(dst_repo), id, message))
+          @gh.merge_pull_request(repo_name_full(dst_repo), id, message), @gh)
       end
 
       def close_pull_request(dst_repo, id)
         Gitomator::GitHub::Model::PullRequest.new(
-          @gh.close_pull_request(repo_name_full(dst_repo), id))
+          @gh.close_pull_request(repo_name_full(dst_repo), id), @gh)
       end
 
       def open_pull_request(dst_repo, id)
         Gitomator::GitHub::Model::PullRequest.new(
-          @gh.update_pull_request(repo_name_full(dst_repo), id, {state: :open}))
+          @gh.update_pull_request(repo_name_full(dst_repo), id, {state: :open}), @gh)
       end
 
 
