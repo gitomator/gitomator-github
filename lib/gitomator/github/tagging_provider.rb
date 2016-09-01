@@ -43,7 +43,7 @@ module Gitomator
       # @return Enumerable of object identifiers.
       #
       def search(repo, label)
-        if query.is_a? String
+        if label.is_a? String
           q = "repo:#{@repo_name_resolver.full_name(repo)} type:issue|pr label:\"#{label}\""
           @gh.search_issues(q)
             .items.map {|item| item.number}  # Make the result an array of issue/or id's
