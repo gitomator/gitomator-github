@@ -121,8 +121,12 @@ module Gitomator
       # For opts see http://www.rubydoc.info/gems/octokit/Octokit%2FClient%2FSearch%3Asearch_issues
       #
       def search_repos(query, opts = {})
-        @gh.search_repos("#{query} user:#{@org}", opts).items
-              .map {|r| Gitomator::GitHub::Model::HostedRepo.new(r)}
+        gh_repos = nil
+        with_auto_paginate do
+          gh_repos = @gh.search_repos("#{query} user:#{@org}", opts).items
+        end
+
+        gh_repos.map {|r| Gitomator::GitHub::Model::HostedRepo.new(r)}
       end
 
 
